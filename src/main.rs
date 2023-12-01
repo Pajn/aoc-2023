@@ -8,7 +8,7 @@ use days::*;
 mod days;
 mod parser;
 
-const YEAR: usize = 2022;
+const YEAR: usize = 2023;
 
 #[derive(Parser)]
 #[command(author, version)]
