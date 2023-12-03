@@ -6,6 +6,7 @@ use clap::{Parser, Subcommand};
 use days::*;
 
 mod days;
+mod helpers;
 mod parser;
 
 const YEAR: usize = 2023;
