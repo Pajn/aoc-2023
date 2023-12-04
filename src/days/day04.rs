@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use nom::{
     bytes::complete::tag,
     character::complete::{line_ending, multispace0, multispace1},
@@ -19,15 +21,9 @@ pub struct Card {
 }
 
 impl Day for Day04 {
-    type Input = Vec<Card>;
+    type Input = Vec<Rc<Card>>;
 
     fn parse(input: &str) -> IResult<&str, Self::Input> {
-        // let input = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
-        // Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
-        // Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
-        // Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83
-        // Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36
-        // Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11";
         // let input = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
         // Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
         // Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1
@@ -52,10 +48,12 @@ impl Day for Day04 {
                         separated_list1(multispace1, parse_digit("selected number")),
                     ),
                 )),
-                |(id, winning, selected)| Card {
-                    id,
-                    winning,
-                    selected,
+                |(id, winning, selected)| {
+                    Rc::new(Card {
+                        id,
+                        winning,
+                        selected,
+                    })
                 },
             ),
         ))(input)
@@ -87,15 +85,17 @@ impl Day for Day04 {
     type Output2 = usize;
 
     fn part_2(input: &Self::Input) -> Self::Output2 {
+        let mut scores = vec![None; input.len()];
         let mut cards = input.clone();
         let mut total = cards.len();
 
         while let Some(card) = cards.pop() {
-            let matching = card
-                .selected
-                .iter()
-                .filter(|n| card.winning.contains(n))
-                .count();
+            let matching = *scores[card.id - 1].get_or_insert_with(|| {
+                card.selected
+                    .iter()
+                    .filter(|n| card.winning.contains(n))
+                    .count()
+            });
             for id in (card.id)..(card.id + matching) {
                 if let Some(card) = input.get(id) {
                     cards.push(card.clone());
