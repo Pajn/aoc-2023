@@ -7,6 +7,7 @@ use nom::{
     sequence::{delimited, preceded, tuple},
     IResult,
 };
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::days::Day;
 
@@ -21,8 +22,9 @@ impl Race {
         (self.time - button_time) * button_time
     }
 
-    fn winning_moves<'a>(&'a self) -> impl Iterator<Item = (usize, usize)> + 'a {
+    fn winning_moves<'a>(&'a self) -> impl ParallelIterator<Item = (usize, usize)> + 'a {
         (1..self.time)
+            .into_par_iter()
             .map(|button_time| (button_time, self.distance(button_time)))
             .filter(|(_time, distance)| *distance > self.distance)
     }
