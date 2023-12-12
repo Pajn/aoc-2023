@@ -5,6 +5,7 @@ edition = "2021"
 authors = ["Rasmus Eneman <rasmus@eneman.eu>"]
 
 [dependencies]
+array2d = "0.3.0"
 chrono = "0.4"
 clap = { version = "4", features = ["derive"] }
 itertools = "0.12"
